@@ -5,11 +5,11 @@ var lat;
 var lon;
 var now = dayjs().format('MM/DD/YYYY');
 
+// on Submit it resets clears the results from the previous search, calls the getCoordinates function
 function searchFormSubmit(event) {
     event.preventDefault();
 
     var searchInputEl = document.querySelector('#search-input').value;
-    console.log(searchInputEl)
 
     if (!searchInputEl) {
         alert('Enter a City');
@@ -22,6 +22,7 @@ function searchFormSubmit(event) {
 
 }
 
+// calls the open Weather api with the user input, extracts the lat and lon for that city, calls the getCurrent and getForecast functions
 function getCoordinates(searchInput) {
     var apiUrl = 'https://api.openweathermap.org/geo/1.0/direct?q=' + searchInput + '&limit=1&appid=d04c7278addcd711be0869a0c217a78a';
 
@@ -41,6 +42,7 @@ function getCoordinates(searchInput) {
     });
 }
 
+// calls the open Weather api with the lat and lon to get the current weather data, calls displayCurrent function
 function getCurrent() {
 var apiUrl = 'https://api.openweathermap.org/data/2.5/weather?lat=' + lat + '&lon=' + lon + '&units=imperial' + '&appid=d04c7278addcd711be0869a0c217a78a'
 
@@ -56,7 +58,7 @@ fetch(apiUrl)
 })
 }
 
-
+// creates elements on the pate and displays the current weather data along with some styling.
 function displayCurrent(data) {
     // console.log(data)
     if (data.length === 0) {
@@ -83,6 +85,7 @@ var humidity = data.main.humidity;
 
 var titleEl = document.createElement('h2')
 titleEl.classList = 'p-3'
+// using dayjs to display current date for the current weather section
 titleEl.textContent = city + ' ' +'('+ now + ')';
 
 addCurrentLi1.textContent = 'Temp: ' + temp + ' F';
@@ -97,7 +100,7 @@ addCurrentUl.appendChild(addCurrentLi2);
 addCurrentUl.appendChild(addCurrentLi3);
 }
 
-
+// gets the 5 day weather forecast with the lat and lon data and calls the displayForecast function
 function getForecast(lat, lon) {
     var apiUrl = 'https://api.openweathermap.org/data/2.5/forecast?lat='+ lat + '&lon=' + lon +'&units=imperial' + '&appid=d04c7278addcd711be0869a0c217a78a';
 
@@ -114,12 +117,14 @@ function getForecast(lat, lon) {
     })
 }
 
+// displays the 5 day forecast on the page,
 function displayForecast(data) {
     if (data.length === 0 ) {
         showCurrentEl.textContent = 'No Forecast data For City';
         return;
     }
 
+// creating static elements on page to display data
     var forecastDiv = document.createElement('div');
     var cardGroupDivEl = document.createElement('div')
     cardGroupDivEl.classList='card-group'
@@ -131,14 +136,7 @@ function displayForecast(data) {
     forecastDiv.appendChild(forecastHeader);
     forecastDiv.appendChild(cardGroupDivEl);
 
-    console.log(data.list[0].dt)
-
-
-    // for (var i = 0; i < data.list.length; i++) {
-    //     offsetDate = data[i].list.dt;
-    //     console.log
-    // }
-
+// loop through data, using momentjs to convert the Unix timestamp, create elements to display 5 day forecast on page
     for (var i = 0; i < data.list.length; i++) {
         var dayData = data.list[i];
         var dayTimeUTC = dayData.dt;
@@ -146,17 +144,10 @@ function displayForecast(data) {
         var timeZoneOffsetHours = timeZoneOffset / 60 / 60;
         var thisMoment = moment.unix(dayTimeUTC).utc().utcOffset(timeZoneOffsetHours);
         var cardDate =  thisMoment.format('MM/DD/YY');
-        
         var iconURL = "https://openweathermap.org/img/w/" + dayData.weather[0].icon + ".png";
        console.log(dayData)
-    //   console.log(dayTimeUTC)
-    //   console.log(timeZoneOffset)
-    //   console.log(timeZoneOffsetHours)
-    //   console.log(thisMoment)
-    //    var display = thisMoment.format("HH:mm:ss")
-    //    console.log(display)
     
-
+// Only displaying weather data for 10am or 11am
         if (thisMoment.format("HH:mm:ss") === "10:00:00" || thisMoment.format("HH:mm:ss") === "11:00:00") {
             var cardDivEl = document.createElement('div');
             cardDivEl.classList='card m-2 border';
